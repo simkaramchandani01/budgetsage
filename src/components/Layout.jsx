@@ -4,6 +4,7 @@ import { useTransactions } from "../data/store.js";
 import { getNetBalance, getTotalIncome, getTotalExpenses } from "../data/stats.js";
 import AddTransactionModal from "./AddTransactionModal";
 import ImportModal from "./ImportModal";
+import DropboxSync from "./DropboxSync";
 
 const NAV_ITEMS = [
   { label: "Dashboard",    href: "/",             Icon: LayoutDashboard },
@@ -74,6 +75,8 @@ export default function Layout({ children }) {
             <Upload size={14} strokeWidth={2} />
             Import Wallet
           </button>
+
+          <DropboxSync onImport={importTransactions} />
         </aside>
 
         <main className="layout-main">{children}</main>
