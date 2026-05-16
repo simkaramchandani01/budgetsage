@@ -47,7 +47,7 @@ export async function listCSVFiles(token) {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ path: "", recursive: false }),
+    body: JSON.stringify({ path: "/BudgetSage", recursive: false }),
   });
   if (res.status === 401) throw new Error("TOKEN_EXPIRED");
   if (!res.ok) throw new Error(`Dropbox error ${res.status}`);
