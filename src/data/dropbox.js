@@ -19,7 +19,7 @@ export function clearAuth() {
 export function getAuthUrl() {
   const appKey = import.meta.env.VITE_DROPBOX_APP_KEY;
   if (!appKey) return null;
-  const redirectUri = window.location.origin;
+  const redirectUri = window.location.origin + "/";
   const params = new URLSearchParams({
     response_type: "token",
     client_id: appKey,
@@ -41,28 +41,37 @@ export function parseTokenFromHash() {
 }
 
 export async function listCSVFiles(token) {
+  const folderLink = import.meta.env.VITE_DROPBOX_FOLDER_LINK;
+  const body = folderLink
+    ? { shared_link: { url: folderLink }, path: "" }
+    : { path: "/BudgetSage", recursive: false };
+
   const res = await fetch("https://api.dropboxapi.com/2/files/list_folder", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ path: "/BudgetSage", recursive: false }),
+    body: JSON.stringify(body),
   });
   if (res.status === 401) throw new Error("TOKEN_EXPIRED");
-  if (!res.ok) throw new Error(`Dropbox error ${res.status}`);
+  if (!res.ok) {
+    const errText = await res.text().catch(() => "");
+    throw new Error(`Dropbox error ${res.status}: ${errText}`);
+  }
   const data = await res.json();
   return data.entries
     .filter(e => e[".tag"] === "file" && e.name.toLowerCase().endsWith(".csv"))
     .sort((a, b) => b.client_modified.localeCompare(a.client_modified));
 }
 
-export async function downloadFile(token, path) {
+// fileId is the Dropbox file id field (e.g. "id:abc123...") returned by list_folder
+export async function downloadFile(token, fileId) {
   const res = await fetch("https://content.dropboxapi.com/2/files/download", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      "Dropbox-API-Arg": JSON.stringify({ path }),
+      "Dropbox-API-Arg": JSON.stringify({ path: fileId }),
     },
   });
   if (res.status === 401) throw new Error("TOKEN_EXPIRED");

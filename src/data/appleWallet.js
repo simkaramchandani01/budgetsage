@@ -47,7 +47,7 @@ export function parseAppleWalletCSV(text) {
     h.trim().replace(/^"|"$/g, "").toLowerCase()
   );
 
-  const dateIdx = header.findIndex(h => h.includes("transaction date"));
+  const dateIdx = header.findIndex(h => h.includes("transaction date") || h === "date");
   const descIdx = header.findIndex(h => h === "description");
   const catIdx  = header.findIndex(h => h === "category");
   const typeIdx = header.findIndex(h => h === "type");

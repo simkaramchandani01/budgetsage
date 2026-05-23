@@ -1,3 +1,4 @@
+import { TransactionsProvider } from './context/TransactionsContext'
 import Layout from './components/Layout'
 import Dashboard from './views/Dashboard'
 
@@ -10,9 +11,11 @@ const views: Record<string, React.FC> = {
 function App() {
   const View = views[window.location.pathname] ?? Dashboard
   return (
-    <Layout>
-      <View />
-    </Layout>
+    <TransactionsProvider>
+      <Layout>
+        <View />
+      </Layout>
+    </TransactionsProvider>
   )
 }
 

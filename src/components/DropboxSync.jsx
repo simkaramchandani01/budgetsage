@@ -42,8 +42,9 @@ export default function DropboxSync({ onImport }) {
       const updatedIds = [...alreadyImported];
 
       for (const file of fresh) {
-        const text = await downloadFile(token, file.path_lower);
-        const { rows } = parseAppleWalletCSV(text);
+        const text = await downloadFile(token, file.id);
+        const { rows, error: parseError } = parseAppleWalletCSV(text);
+        if (parseError) throw new Error(`${file.name}: ${parseError}`);
         if (rows.length) {
           const clean = rows.map(({ _original, ...r }) => r);
           onImport(clean);
